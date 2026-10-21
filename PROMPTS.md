@@ -10,7 +10,7 @@ Project conventions the agent followed are in the planning `CLAUDE.md` (summariz
 >
 > *(followed by the full assignment text from Sezzle)*
 
-> i want to use service controller arquitecture, i want both backend and frondend to be dockerized, use gin
+> i want to use model service controller arquitecture, i want both backend and frondend to be dockerized, use gin
 > to handle REST communication and zap logger to logs
 
 > what are your suggestions
@@ -22,4 +22,10 @@ documented note on decimal money handling, nginx-proxied frontend container, and
 
 ## 2. Implementation
 
-*(appended as the work progresses)*
+> I created the repository: https://github.com/cmmmf/SezzleCalculator
+
+> lets go
+
+Phase 2: Claude wrote the config, zap logger, API models and the calculator service with table-driven
+tests. It proposed splitting NaN results (`UNDEFINED_RESULT`) from overflow (`RESULT_OUT_OF_RANGE`) and
+normalizing `-0` to `0`.
