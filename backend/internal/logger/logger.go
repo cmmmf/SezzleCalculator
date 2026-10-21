@@ -27,8 +27,12 @@ func New(level, format string) (*zap.Logger, error) {
 		return nil, fmt.Errorf("unsupported log format %q", format)
 	}
 	cfg.Level = zap.NewAtomicLevelAt(lvl)
+	// Request logs at Warn/Error would otherwise carry the middleware's own
+	// stack, which says nothing useful. Panics log their stack explicitly.
+	cfg.DisableStacktrace = true
 	cfg.EncoderConfig.TimeKey = "timestamp"
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	cfg.EncoderConfig.EncodeDuration = zapcore.StringDurationEncoder // "1.2ms", not 0.0012
 
 	log, err := cfg.Build()
 	if err != nil {

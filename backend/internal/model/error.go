@@ -10,6 +10,7 @@ const (
 	CodeUndefinedResult    = "UNDEFINED_RESULT"
 	CodeNotFound           = "NOT_FOUND"
 	CodeMethodNotAllowed   = "METHOD_NOT_ALLOWED"
+	CodePayloadTooLarge    = "PAYLOAD_TOO_LARGE"
 	CodeInternalError      = "INTERNAL_ERROR"
 )
 

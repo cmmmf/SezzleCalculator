@@ -29,3 +29,10 @@ documented note on decimal money handling, nginx-proxied frontend container, and
 Phase 2: Claude wrote the config, zap logger, API models and the calculator service with table-driven
 tests. It proposed splitting NaN results (`UNDEFINED_RESULT`) from overflow (`RESULT_OUT_OF_RANGE`) and
 normalizing `-0` to `0`.
+
+> yes
+
+Phase 3: Claude wrote the Gin controller (strict JSON binding: unknown fields and trailing data rejected),
+middleware (request ID, zap request logger, recovery, CORS, body limit), router and `main.go` with graceful
+shutdown and a `-healthcheck` flag for the distroless image. It smoke-tested the binary and fixed two log
+issues it found (noisy stack traces on 4xx, Gin's error formatting).
