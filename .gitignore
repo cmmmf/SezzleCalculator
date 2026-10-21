@@ -14,5 +14,3 @@ Thumbs.db
 .env
 .env.*
 
-# AI prompt log: edited locally before it is committed
-PROMPTS.md
