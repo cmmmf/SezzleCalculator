@@ -1,0 +1,7 @@
+# Keep the build context small; dependencies are installed inside the image.
+node_modules
+dist
+coverage
+*.local
+Dockerfile
+.dockerignore

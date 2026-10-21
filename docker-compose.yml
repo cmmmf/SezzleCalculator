@@ -1,0 +1,31 @@
+# docker compose up --build  →  http://localhost:3000
+# Host ports can be changed if they are taken, e.g. BACKEND_PORT=18080.
+services:
+  backend:
+    build: ./backend
+    environment:
+      GIN_MODE: release
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      # distroless has no shell or curl: the binary probes its own /healthz.
+      test: ["CMD", "/server", "-healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

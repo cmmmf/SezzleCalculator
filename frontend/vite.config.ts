@@ -11,6 +11,7 @@ export default defineConfig({
     proxy: {
       '/api': backendURL,
       '/healthz': backendURL,
+      '/swagger': backendURL,
     },
   },
   test: {
