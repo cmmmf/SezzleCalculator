@@ -1,111 +1,245 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --key: #f3f4f6;
+  --key-hover: #e5e7eb;
+  --function: #e0e7ff;
+  --function-hover: #c7d2fe;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-text: #ffffff;
+  --error-bg: #fef2f2;
+  --error-text: #b91c1c;
+  --error-border: #fecaca;
+  --focus: #f59e0b;
+  --shadow: 0 10px 30px rgb(0 0 0 / 0.08);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
   color-scheme: light dark;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --bg: #0b0f19;
+    --surface: #161b26;
+    --text: #f3f4f6;
+    --muted: #9ca3af;
+    --key: #1f2633;
+    --key-hover: #2a3242;
+    --function: #262f45;
+    --function-hover: #313c58;
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --error-bg: #2a1215;
+    --error-text: #fca5a5;
+    --error-border: #7f1d1d;
+    --shadow: 0 10px 30px rgb(0 0 0 / 0.4);
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+.app__title {
   margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--muted);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.app__hint {
+  max-width: 22rem;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  text-align: center;
+  color: var(--muted);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--key-hover);
+  border-radius: 0.25rem;
+  font-family: ui-monospace, Consolas, monospace;
+  background: var(--surface);
+}
+
+/* Calculator */
+
+.calculator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(100%, 22rem);
+  padding: 1rem;
+  border-radius: 1.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-height: 6rem;
+  padding: 0.5rem 0.75rem;
+  text-align: right;
+}
+
+.display__expression {
+  min-height: 1.5rem;
+  font-size: 1rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.display__loading {
+  font-style: italic;
+}
+
+.display__value {
+  font-size: 2.75rem;
+  font-weight: 300;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.display__value--long {
+  font-size: 1.75rem;
+}
+
+.error-banner {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--error-border);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--error-text);
+  background: var(--error-bg);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+}
+
+.key {
+  min-height: 3.5rem;
+  border: none;
+  border-radius: 1rem;
+  font: inherit;
+  font-size: 1.35rem;
+  color: var(--text);
+  background: var(--key);
+  cursor: pointer;
+  touch-action: manipulation; /* no double-tap zoom on mobile */
+  transition: background-color 120ms;
+}
+
+.key:hover:not(:disabled) {
+  background: var(--key-hover);
+}
+
+.key:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.key:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.key:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.key--function,
+.key--operator {
+  background: var(--function);
+}
+
+.key--function:hover:not(:disabled),
+.key--operator:hover:not(:disabled) {
+  background: var(--function-hover);
+}
+
+.key--operator {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.key--equals {
+  grid-row: span 2;
+  color: var(--accent-text);
+  background: var(--accent);
+}
+
+.key--equals:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.key--wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 360px) {
+  .app {
+    padding: 1rem 0.5rem;
+  }
+
+  .calculator {
+    padding: 0.75rem;
+  }
+
+  .keypad {
+    gap: 0.45rem;
+  }
+
+  .key {
+    min-height: 3rem;
+    font-size: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key {
+    transition: none;
+  }
+
+  .key:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Keyboard shortcuts mean nothing on touch-only devices. */
+@media (hover: none) {
+  .app__hint {
+    display: none;
+  }
 }

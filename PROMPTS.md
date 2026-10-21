@@ -54,3 +54,11 @@ user-friendly messages, network failures and malformed responses handled), a pur
 validation), a display formatter and the `useCalculator` hook that sends pending requests and aborts them on
 clear/unmount. Running the tests caught a real bug: formatting to 12 significant digits rounded
 15-digit inputs, so it moved to 15 (the float64 round-trip limit).
+
+> do it
+
+Phase 5: Claude replaced the Vite scaffold with `Display`, `Keypad` (accessible names on symbol keys, `=`
+disabled in flight), `ErrorBanner` and `Calculator`, a `useKeyboardShortcuts` hook (ignores Ctrl/Alt/Meta
+shortcuts, prevents Enter from also clicking a focused key), and plain responsive CSS with a 4-column grid
+and dark mode. User-flow tests drive the real client, hook and reducer against a fake `fetch` backend. It
+checked the layout in headless Edge at desktop, 390 px and 320 px widths.
