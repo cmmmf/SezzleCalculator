@@ -43,3 +43,14 @@ Claude hand-wrote an OpenAPI 3.1 spec (`internal/docs/openapi.yaml`), embedded i
 it with Swagger UI at `/swagger`. It chose this over swaggo to avoid a code generator and new dependencies
 (swaggo also only emits Swagger 2.0), and added a router test that fails if the spec and the registered
 routes drift apart.
+
+> how can i start the server?
+
+> let's start phase 4
+
+Phase 4: Claude wrote the typed API client (`calculatorService.ts`, injectable `fetch`, error codes mapped to
+user-friendly messages, network failures and malformed responses handled), a pure keypad reducer (pressing
+`=` sets a `pending` request instead of fetching; operator chaining, sign toggle, 15-digit input cap, client
+validation), a display formatter and the `useCalculator` hook that sends pending requests and aborts them on
+clear/unmount. Running the tests caught a real bug: formatting to 12 significant digits rounded
+15-digit inputs, so it moved to 15 (the float64 round-trip limit).
