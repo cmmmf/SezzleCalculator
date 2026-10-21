@@ -20,8 +20,8 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
@@ -35,7 +35,7 @@ jobs:
         run: |
           go tool cover -func=coverage.out | tail -n 1
           go tool cover -html=coverage.out -o coverage.html
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: backend-coverage
           path: backend/coverage.html
@@ -47,8 +47,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -62,7 +62,7 @@ jobs:
         run: npm run coverage
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: frontend-coverage
           path: frontend/coverage
@@ -72,18 +72,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: [backend, frontend]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build images
         run: docker compose build
       - name: Start the stack
         run: docker compose up -d --wait
       - name: Smoke test through nginx
         run: |
-          curl -fsS http://localhost:3000/ | grep -q '<title>Calculator</title>'
-          curl -fsS http://localhost:3000/healthz
-          curl -fsS -X POST http://localhost:3000/api/v1/divide \
+          curl -fsS http://localhost:8080/ | grep -q '<title>Calculator</title>'
+          curl -fsS http://localhost:8080/healthz
+          curl -fsS -X POST http://localhost:8080/api/v1/divide \
             -H 'Content-Type: application/json' -d '{"a":10,"b":4}' | grep -q '"result":2.5'
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:3000/api/v1/divide \
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/v1/divide \
             -H 'Content-Type: application/json' -d '{"a":1,"b":0}')" = 422
       - name: Logs on failure
         if: failure()
