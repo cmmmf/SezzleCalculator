@@ -35,7 +35,7 @@ jobs:
         run: |
           go tool cover -func=coverage.out | tail -n 1
           go tool cover -html=coverage.out -o coverage.html
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: backend-coverage
           path: backend/coverage.html
@@ -62,7 +62,7 @@ jobs:
         run: npm run coverage
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: frontend-coverage
           path: frontend/coverage
