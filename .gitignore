@@ -1,0 +1,15 @@
+# Go
+backend/coverage.out
+backend/coverage.html
+backend/bin/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env
+.env
+.env.*
