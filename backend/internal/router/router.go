@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cmmmf/SezzleCalculator/backend/internal/controller"
+	"github.com/cmmmf/SezzleCalculator/backend/internal/docs"
 	"github.com/cmmmf/SezzleCalculator/backend/internal/middleware"
 	"github.com/cmmmf/SezzleCalculator/backend/internal/model"
 )
@@ -40,6 +41,7 @@ func New(opts Options) *gin.Engine {
 	)
 
 	engine.GET("/healthz", controller.Health)
+	docs.Register(engine)
 
 	calc := opts.Calculator
 	v1 := engine.Group("/api/v1")

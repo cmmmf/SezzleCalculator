@@ -36,3 +36,10 @@ Phase 3: Claude wrote the Gin controller (strict JSON binding: unknown fields an
 middleware (request ID, zap request logger, recovery, CORS, body limit), router and `main.go` with graceful
 shutdown and a `-healthcheck` flag for the distroless image. It smoke-tested the binary and fixed two log
 issues it found (noisy stack traces on 4xx, Gin's error formatting).
+
+> Add swagger to my back end service
+
+Claude hand-wrote an OpenAPI 3.1 spec (`internal/docs/openapi.yaml`), embedded it with `go:embed` and served
+it with Swagger UI at `/swagger`. It chose this over swaggo to avoid a code generator and new dependencies
+(swaggo also only emits Swagger 2.0), and added a router test that fails if the spec and the registered
+routes drift apart.

@@ -1,0 +1,315 @@
+openapi: 3.1.0
+info:
+  title: Sezzle Calculator API
+  version: 1.0.0
+  description: |
+    REST API for a calculator. Each operation has its own route and takes its
+    operands as a JSON object.
+
+    - Operands and results are IEEE-754 `float64`. The API never rounds;
+      display formatting is the client's job. `-0` is returned as `0`.
+    - Request bodies are strict: unknown fields, trailing data and bodies over
+      1 KB are rejected.
+    - Every error response has the same shape. Clients should branch on
+      `error.code`; `error.message` is for humans and may change.
+    - Send `X-Request-ID` to correlate logs; it is generated when missing and
+      always echoed back.
+servers:
+  - url: /
+tags:
+  - name: operations
+    description: Calculator operations
+  - name: health
+    description: Liveness probe
+
+paths:
+  /api/v1/add:
+    post:
+      tags: [operations]
+      operationId: add
+      summary: a + b
+      requestBody: { $ref: '#/components/requestBodies/Binary' }
+      responses:
+        '200':
+          description: Sum of the operands.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: add, result: 14 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/OutOfRange' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/subtract:
+    post:
+      tags: [operations]
+      operationId: subtract
+      summary: a − b
+      requestBody: { $ref: '#/components/requestBodies/Binary' }
+      responses:
+        '200':
+          description: Difference of the operands.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: subtract, result: 6 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/OutOfRange' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/multiply:
+    post:
+      tags: [operations]
+      operationId: multiply
+      summary: a × b
+      requestBody: { $ref: '#/components/requestBodies/Binary' }
+      responses:
+        '200':
+          description: Product of the operands.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: multiply, result: 40 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/OutOfRange' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/divide:
+    post:
+      tags: [operations]
+      operationId: divide
+      summary: a ÷ b
+      requestBody: { $ref: '#/components/requestBodies/Binary' }
+      responses:
+        '200':
+          description: Quotient of the operands.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: divide, result: 2.5 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422':
+          description: |
+            `DIVISION_BY_ZERO` when `b` is 0, or `RESULT_OUT_OF_RANGE` when the
+            quotient overflows `float64`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                divisionByZero: { $ref: '#/components/examples/DivisionByZero' }
+                outOfRange: { $ref: '#/components/examples/ResultOutOfRange' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/power:
+    post:
+      tags: [operations]
+      operationId: power
+      summary: a raised to the power b
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BinaryOperationRequest' }
+            example: { a: 2, b: 10 }
+      responses:
+        '200':
+          description: a^b.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: power, result: 1024 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422':
+          description: |
+            `RESULT_OUT_OF_RANGE` when the result is ±Inf (e.g. `10^400`,
+            `0^-1`), or `UNDEFINED_RESULT` when it is NaN (e.g. `(-8)^0.5`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                outOfRange: { $ref: '#/components/examples/ResultOutOfRange' }
+                undefined: { $ref: '#/components/examples/UndefinedResult' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/percentage:
+    post:
+      tags: [operations]
+      operationId: percentage
+      summary: a percent of b
+      description: Returns `a / 100 × b`, so `{"a":15,"b":200}` is 15% of 200 = 30.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BinaryOperationRequest' }
+            example: { a: 15, b: 200 }
+      responses:
+        '200':
+          description: a% of b.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: percentage, result: 30 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/OutOfRange' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/v1/sqrt:
+    post:
+      tags: [operations]
+      operationId: sqrt
+      summary: Square root of a
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UnaryOperationRequest' }
+            example: { a: 16 }
+      responses:
+        '200':
+          description: √a.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationResponse' }
+              example: { operation: sqrt, result: 4 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422':
+          description: '`NEGATIVE_SQUARE_ROOT` when `a` is negative.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: NEGATIVE_SQUARE_ROOT
+                  message: square root of a negative number is not a real number
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /healthz:
+    get:
+      tags: [health]
+      operationId: health
+      summary: Liveness probe
+      responses:
+        '200':
+          description: The server is up.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthResponse' }
+              example: { status: ok }
+
+components:
+  schemas:
+    BinaryOperationRequest:
+      type: object
+      required: [a, b]
+      additionalProperties: false
+      properties:
+        a: { type: number, format: double, description: First operand. }
+        b: { type: number, format: double, description: Second operand. }
+
+    UnaryOperationRequest:
+      type: object
+      required: [a]
+      additionalProperties: false
+      properties:
+        a: { type: number, format: double, description: The operand. }
+
+    OperationResponse:
+      type: object
+      required: [operation, result]
+      properties:
+        operation:
+          type: string
+          enum: [add, subtract, multiply, divide, power, percentage, sqrt]
+        result:
+          type: number
+          format: double
+
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Stable, machine-readable error code.
+              enum:
+                - INVALID_REQUEST
+                - DIVISION_BY_ZERO
+                - NEGATIVE_SQUARE_ROOT
+                - RESULT_OUT_OF_RANGE
+                - UNDEFINED_RESULT
+                - NOT_FOUND
+                - METHOD_NOT_ALLOWED
+                - PAYLOAD_TOO_LARGE
+                - INTERNAL_ERROR
+            message:
+              type: string
+              description: Human-readable explanation. May change; don't parse it.
+
+  requestBodies:
+    Binary:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/BinaryOperationRequest' }
+          example: { a: 10, b: 4 }
+
+  examples:
+    DivisionByZero:
+      value:
+        error: { code: DIVISION_BY_ZERO, message: division by zero is not allowed }
+    ResultOutOfRange:
+      value:
+        error: { code: RESULT_OUT_OF_RANGE, message: result is too large to be represented }
+    UndefinedResult:
+      value:
+        error: { code: UNDEFINED_RESULT, message: result is undefined for the given operands }
+
+  responses:
+    InvalidRequest:
+      description: |
+        `INVALID_REQUEST`: malformed JSON, a missing or null operand, a
+        non-numeric or non-finite operand, an unknown field, or trailing data.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error: { code: INVALID_REQUEST, message: 'field "b" is required' }
+    PayloadTooLarge:
+      description: '`PAYLOAD_TOO_LARGE`: the body is larger than 1 KB.'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error: { code: PAYLOAD_TOO_LARGE, message: request body must not exceed 1024 bytes }
+    OutOfRange:
+      description: '`RESULT_OUT_OF_RANGE`: the result overflows `float64` (±Inf).'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error: { code: RESULT_OUT_OF_RANGE, message: result is too large to be represented }
+    InternalError:
+      description: '`INTERNAL_ERROR`: an unexpected failure. Details are only logged.'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error: { code: INTERNAL_ERROR, message: an unexpected error occurred }

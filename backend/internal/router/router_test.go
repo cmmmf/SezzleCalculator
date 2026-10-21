@@ -12,8 +12,10 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/cmmmf/SezzleCalculator/backend/internal/controller"
+	"github.com/cmmmf/SezzleCalculator/backend/internal/docs"
 	"github.com/cmmmf/SezzleCalculator/backend/internal/middleware"
 	"github.com/cmmmf/SezzleCalculator/backend/internal/service"
 )
@@ -130,4 +132,41 @@ func TestCORSPreflightOnAPIRoute(t *testing.T) {
 
 	assert.Equal(t, http.StatusNoContent, rec.Code)
 	assert.Equal(t, "http://localhost:5173", rec.Header().Get("Access-Control-Allow-Origin"))
+}
+
+// TestSpecMatchesRoutes keeps the hand-written OpenAPI spec honest: every API
+// route must be documented, and every documented operation must exist.
+func TestSpecMatchesRoutes(t *testing.T) {
+	engine, _ := newEngine(t)
+
+	var spec struct {
+		Paths map[string]map[string]any `yaml:"paths"`
+	}
+	require.NoError(t, yaml.Unmarshal(docs.Spec, &spec))
+
+	documented := map[string]bool{}
+	for path, ops := range spec.Paths {
+		for method := range ops {
+			documented[strings.ToUpper(method)+" "+path] = true
+		}
+	}
+
+	registered := map[string]bool{}
+	for _, r := range engine.Routes() {
+		if strings.HasPrefix(r.Path, docs.UIPath) {
+			continue // the docs themselves are not part of the API
+		}
+		registered[r.Method+" "+r.Path] = true
+	}
+
+	assert.Equal(t, registered, documented)
+}
+
+func TestSwaggerUIIsServed(t *testing.T) {
+	engine, _ := newEngine(t)
+	for _, path := range []string{docs.UIPath, docs.SpecPath} {
+		rec := httptest.NewRecorder()
+		engine.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
+		assert.Equal(t, http.StatusOK, rec.Code, path)
+	}
 }
